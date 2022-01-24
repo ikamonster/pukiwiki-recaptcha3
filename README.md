@@ -1,4 +1,4 @@
-# PukiWiki用プラグイン<br>タブ表示 recaptcha3.inc.php
+# PukiWiki用プラグイン<br>スパム対策 recaptcha3.inc.php
 
 Google reCAPTCHA v3 によりスパムを防ぐ[PukiWiki](https://pukiwiki.osdn.jp/)用プラグイン。  
 
