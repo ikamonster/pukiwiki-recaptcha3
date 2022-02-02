@@ -14,9 +14,13 @@ PukiWiki をほぼ素のままで運用し、手軽にスパム対策したい�
 禁止語句によるスパム判定機能もあります。  
 reCAPTCHA を使わず、禁止語句判定のみ用いることも可能です。
 
+<br>
+
 |対象PukiWikiバージョン|対象PHPバージョン|
 |:---:|:---:|
 |PukiWiki 1.5.3 ~ 1.5.4RC (UTF-8)|PHP 7.4 ~ 8.1|
+
+<br>
 
 ## インストール
 
@@ -25,9 +29,15 @@ reCAPTCHA を使わず、禁止語句判定のみ用いることも可能です�
 1. [GitHubページ](https://github.com/ikamonster/pukiwiki-recaptcha3) からダウンロードした recaptcha3.inc.php を PukiWiki の plugin ディレクトリに配置する。
 2. Google reCAPTCHA サイトでウィキのドメインを「reCAPTCHA v3」タイプで登録し、取得したサイトキー・シークレットキーを本プラグイン内の定数 PLUGIN_RECAPTCHA3_SITE_KEY, PLUGIN_RECAPTCHA3_SECRET_KEY に設定する。
 3. スキンファイルのほぼ末尾、</body> 閉じタグの直前に次のコードを挿入する。  
-```<?php if (exist_plugin_convert('recaptcha3')) echo do_plugin_convert('recaptcha3'); // reCAPTCHA v3 plugin ?>```
+```PHP
+<?php if (exist_plugin_convert('recaptcha3')) echo do_plugin_convert('recaptcha3'); // reCAPTCHA v3 plugin ?>
+```
 4. ライブラリファイル lib/plugin.php の「function do_plugin_action($name)」関数内、「```$retvar = call_user_func('plugin_' . $name . '_action');```」行の直前に次のコードを挿入する。  
-```if (exist_plugin_action('recaptcha3') && ($__v = call_user_func_array('plugin_recaptcha3_action', array($name))['body'])) die_message($__v); // reCAPTCHA v3 plugin```
+```PHP
+if (exist_plugin_action('recaptcha3') && ($__v = call_user_func_array('plugin_recaptcha3_action', array($name))['body'])) die_message($__v); // reCAPTCHA v3 plugin
+```
+
+<br>
 
 ## 詳細
 
@@ -47,6 +57,8 @@ reCAPTCHA を使わず、禁止語句判定のみ用いることも可能です�
 |PLUGIN_RECAPTCHA3_ERR_STATUS|HTTPステータスコード|403|拒否時に返すHTTPステータスコード|
 |PLUGIN_RECAPTCHA3_DISABLED|0 or 1|0|1なら本プラグインを無効化（メンテナンス用）|
 
+<br>
+
 ### 動作確認
 
 本プラグインが正しく導入されていれば、ページ末尾に「This site is protected by reCAPTCHA and the Google Privacy Policy and Terms of Service apply.」との文言（定数設定によってはreCAPTCHAバッジ）が表示されます。  
@@ -58,6 +70,8 @@ reCAPTCHA を使わず、禁止語句判定のみ用いることも可能です�
 実際のスパム攻撃については、Google reCAPTCHAサイトの管理画面に統計が表示されます。スコア閾値調整の参考にもなります。
 
 なお、本プラグインが正しく導入されていても、レガシーブラウザーでは常に編集に失敗するかもしれませんが、仕様（非対応）としてご了承ください。
+
+<br>
 
 ### スパム拒否の仕組み
 
@@ -73,16 +87,20 @@ reCAPTCHA を使わず、禁止語句判定のみ用いることも可能です�
   * 投稿禁止語句が設定されており、かつテキスト投稿を伴うプラグインであればその内容を判定  
 → 特定の宣伝文句などを含むスパムをはじくことができる。URLを禁止するのが最も広範で効果的だが、不便にもなるので注意
 
+<br>
+
 ### 高度な設定：対象プラグインの追加
 
 本プラグインはデフォルトで、PukiWikiに標準添付の編集系プラグインのみをスパム判定の対象としています。  
 具体的には次の通り。
 
-article, attach, bugtrack, comment, edit, freeze, insert, loginform, memo, pcomment, rename, template, tracker, unfreeze, vote
+``article, attach, bugtrack, comment, edit, freeze, insert, loginform, memo, pcomment, rename, template, tracker, unfreeze, vote``
 
 スパムボットは標準プラグインを標的にすると考えられるため、一般的にはこれで十分なはずです。  
 しかし、もし特定のサードパーティ製プラグインを標的として攻撃されていたら、コード内の $targetPlugins 配列にそのプラグイン名を他行に倣って追加してください。  
 ただし上述した通り、プラグインの編集・投稿機能が POST メソッドの form 要素かつ submit ボタンで送信する仕組みになっていないと効果がなく、処理内容による相性にも左右されます。
+
+<br>
 
 ### ご注意
 
