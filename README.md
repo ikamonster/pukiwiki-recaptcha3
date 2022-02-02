@@ -1,5 +1,3 @@
-<meta name="google-site-verification" content="_pzN1dcFPUaFYxcPlHEiya8gcZHC-Mw45k8oKt0IP6I" />
-
 # PukiWiki用プラグイン<br>スパム対策 recaptcha3.inc.php
 
 Google reCAPTCHA v3 によりスパムを防ぐ[PukiWiki](https://pukiwiki.osdn.jp/)用プラグイン。  
