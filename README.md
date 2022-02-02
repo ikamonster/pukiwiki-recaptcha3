@@ -1,3 +1,5 @@
+<meta name="google-site-verification" content="_pzN1dcFPUaFYxcPlHEiya8gcZHC-Mw45k8oKt0IP6I" />
+
 # PukiWiki用プラグイン<br>スパム対策 recaptcha3.inc.php
 
 Google reCAPTCHA v3 によりスパムを防ぐ[PukiWiki](https://pukiwiki.osdn.jp/)用プラグイン。  
@@ -22,7 +24,7 @@ reCAPTCHA を使わず、禁止語句判定のみ用いることも可能です�
 
 以下の手順に沿って PukiWiki に導入してください。
 
-1. recaptcha3.inc.php を PukiWiki の plugin ディレクトリに配置する。
+1. [GitHubページ](https://github.com/ikamonster/pukiwiki-recaptcha3) からダウンロードした recaptcha3.inc.php を PukiWiki の plugin ディレクトリに配置する。
 2. Google reCAPTCHA サイトでウィキのドメインを「reCAPTCHA v3」タイプで登録し、取得したサイトキー・シークレットキーを本プラグイン内の定数 PLUGIN_RECAPTCHA3_SITE_KEY, PLUGIN_RECAPTCHA3_SECRET_KEY に設定する。
 3. スキンファイルのほぼ末尾、</body> 閉じタグの直前に次のコードを挿入する。  
 ```<?php if (exist_plugin_convert('recaptcha3')) echo do_plugin_convert('recaptcha3'); // reCAPTCHA v3 plugin ?>```
