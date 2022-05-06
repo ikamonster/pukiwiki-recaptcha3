@@ -1,7 +1,7 @@
 <?php
 /**
 PukiWiki - Yet another WikiWikiWeb clone.
-recaptcha3.inc.php, v1.1 2020 M.Taniguchi
+recaptcha3.inc.php, v1.1.1 2020 M.Taniguchi
 License: GPL v3 or (at your option) any later version
 
 Google reCAPTCHA v3 によるスパム対策プラグイン。
@@ -13,7 +13,7 @@ reCAPTCHA v3 は不審な送信者を学習により自動判定する不可視�
 が、そのための副作用として、JavaScriptを活用する高度な編集系サードパーティ製プラグインとは相性が悪いかもしれません。
 PukiWikiをほぼ素のままで運用し、手軽にスパム対策したいかた向けです。
 
-バージョン1.10より、禁止語句によるスパム判定を追加しました。reCAPTCHAを使わず、禁止語句判定のみ用いることも可能です。
+バージョン1.1より、禁止語句によるスパム判定を追加しました。reCAPTCHAを使わず、禁止語句判定のみ用いることも可能です。
 
 【導入手順】
 以下の手順に沿ってシステムに導入してください。
@@ -27,24 +27,24 @@ PukiWikiをほぼ素のままで運用し、手軽にスパム対策したいか
    if (exist_plugin_action('recaptcha3') && ($__v = call_user_func_array('plugin_recaptcha3_action', array($name))['body'])) die_message($__v); // reCAPTCHA v3 plugin
 
 【ご注意】
-・PukiWiki 1.5.3／PHP 7.4／UTF-8／主要モダンブラウザーで動作確認済み。旧バージョンでも動くかもしれませんが非推奨です。
+・PukiWiki 1.5.4／PHP 8.1／UTF-8／主要モダンブラウザーで動作確認済み。旧バージョンでも動くかもしれませんが非推奨です。
 ・標準プラグイン以外の動作確認はしていません。サードパーティ製プラグインによっては機能が妨げられる場合があります。
 ・JavaScriptが有効でないと動作しません。
 ・サーバーからreCAPTCHA APIへのアクセスにcURLを使用します。
-・reCAPTCHA v3 について詳しくはGoogleのreCAPTCHAサイトをご覧ください。https: //www.google.com/recaptcha/
+・reCAPTCHA v3 について詳しくはGoogleのreCAPTCHAサイトをご覧ください。https://www.google.com/recaptcha/
 */
 
 /////////////////////////////////////////////////
 // スパム対策プラグイン設定（recaptcha3.inc.php）
-if (!defined('PLUGIN_RECAPTCHA3_SITE_KEY'))      define('PLUGIN_RECAPTCHA3_SITE_KEY',       '');   // Google reCAPTCHA v3 サイトキー。空の場合、reCAPTCHA判定は実施されない
-if (!defined('PLUGIN_RECAPTCHA3_SECRET_KEY'))    define('PLUGIN_RECAPTCHA3_SECRET_KEY',     '');   // Google reCAPTCHA v3 シークレットキー。空の場合、reCAPTCHA判定は実施されない
-if (!defined('PLUGIN_RECAPTCHA3_SITE_KEY'))      define('PLUGIN_RECAPTCHA3_SCORE_THRESHOLD', 0.5); // スコア閾値（0.0～1.0）。reCAPTCHAによる判定スコアがこの値より低い送信者はスパマーとみなして要求を拒否する。なお、直接プラグインURLを叩く種類のロボットはスコアによらず必ず拒否される
-if (!defined('PLUGIN_RECAPTCHA3_HIDE_BADGE'))    define('PLUGIN_RECAPTCHA3_HIDE_BADGE',      1);   // reCAPTCHAバッジを非表示にし、代替文言を出力する。Googleの規約によりバッジか文言どちらかの表示が必須
-if (!defined('PLUGIN_RECAPTCHA3_API_TIMEOUT'))   define('PLUGIN_RECAPTCHA3_API_TIMEOUT',     0);   // reCAPTCHA APIタイムアウト時間（秒）。0なら無指定
-if (!defined('PLUGIN_RECAPTCHA3_CENSORSHIP'))    define('PLUGIN_RECAPTCHA3_CENSORSHIP',     '');   // 投稿禁止語句を表す正規表現（例：'/((https?|ftp)\:\/\/[\w!?\/\+\-_~=;\.,*&@#$%\(\)\'\[\]]+|宣伝文句)/ui'）
-if (!defined('PLUGIN_RECAPTCHA3_CHECK_REFERER')) define('PLUGIN_RECAPTCHA3_CHECK_REFERER',   0);   // 1ならリファラーを参照し自サイト以外からの要求を拒否。リファラーは未送や偽装があり得るため頼るべきではないが、一時的な防御には使える局面があるかもしれない
-if (!defined('PLUGIN_RECAPTCHA3_ERR_STATUS'))    define('PLUGIN_RECAPTCHA3_ERR_STATUS',      403); // 拒否時に返すHTTPステータスコード
-if (!defined('PLUGIN_RECAPTCHA3_DISABLED'))      define('PLUGIN_RECAPTCHA3_DISABLED',        0);   // 1なら本プラグインを無効化
+if (!defined('PLUGIN_RECAPTCHA3_SITE_KEY'))        define('PLUGIN_RECAPTCHA3_SITE_KEY',       '');   // Google reCAPTCHA v3 サイトキー。空の場合、reCAPTCHA判定は実施されない
+if (!defined('PLUGIN_RECAPTCHA3_SECRET_KEY'))      define('PLUGIN_RECAPTCHA3_SECRET_KEY',     '');   // Google reCAPTCHA v3 シークレットキー。空の場合、reCAPTCHA判定は実施されない
+if (!defined('PLUGIN_RECAPTCHA3_SCORE_THRESHOLD')) define('PLUGIN_RECAPTCHA3_SCORE_THRESHOLD', 0.5); // スコア閾値（0.0～1.0）。reCAPTCHAによる判定スコアがこの値より低い送信者はスパマーとみなして要求を拒否する。なお、直接プラグインURLを叩く種類のロボットはスコアによらず必ず拒否される
+if (!defined('PLUGIN_RECAPTCHA3_HIDE_BADGE'))      define('PLUGIN_RECAPTCHA3_HIDE_BADGE',      1);   // reCAPTCHAバッジを非表示にし、代替文言を出力する。Googleの規約によりバッジか文言どちらかの表示が必須
+if (!defined('PLUGIN_RECAPTCHA3_API_TIMEOUT'))     define('PLUGIN_RECAPTCHA3_API_TIMEOUT',     0);   // reCAPTCHA APIタイムアウト時間（秒）。0なら無指定
+if (!defined('PLUGIN_RECAPTCHA3_CENSORSHIP'))      define('PLUGIN_RECAPTCHA3_CENSORSHIP',     '');   // 投稿禁止語句を表す正規表現（例：'/((https?|ftp)\:\/\/[\w!?\/\+\-_~=;\.,*&@#$%\(\)\'\[\]]+|宣伝文句)/ui'）
+if (!defined('PLUGIN_RECAPTCHA3_CHECK_REFERER'))   define('PLUGIN_RECAPTCHA3_CHECK_REFERER',   0);   // 1ならリファラーを参照し自サイト以外からの要求を拒否。リファラーは未送や偽装があり得るため頼るべきではないが、一時的な防御には使える局面があるかもしれない
+if (!defined('PLUGIN_RECAPTCHA3_ERR_STATUS'))      define('PLUGIN_RECAPTCHA3_ERR_STATUS',      403); // 拒否時に返すHTTPステータスコード
+if (!defined('PLUGIN_RECAPTCHA3_DISABLED'))        define('PLUGIN_RECAPTCHA3_DISABLED',        0);   // 1なら本プラグインを無効化
 
 
 // プラグイン出力
