@@ -1,14 +1,13 @@
 # PukiWiki用プラグイン<br>スパム対策 recaptcha3.inc.php
 
-Google reCAPTCHA v3 によりスパムを防ぐ[PukiWiki](https://pukiwiki.osdn.jp/)用プラグイン。  
+Google [reCAPTCHA v3](https://www.google.com/recaptcha/) によりスパムを防ぐ[PukiWiki](https://pukiwiki.osdn.jp/)用プラグイン。  
 
 ページ編集・コメント投稿・ファイル添付など、PukiWiki 標準の編集機能をスパムから守ります。  
-reCAPTCHA v3 は不審な送信者を学習により自動判定する不可視の防壁です。  
-煩わしい文字入力をユーザーに要求せず、ウィキのユーザビリティーに影響しません。
+reCAPTCHA v3 は不審な送信者を学習により自動判定する不可視の防壁です。煩わしい入力をユーザーに要求せず、ウィキの使用感に影響しません。
 
 追加ファイルはこのプラグインコードだけ。  
 PukiWiki 本体の変更も最小限にし、なるべく簡単に導入できるようにしています。  
-が、そのための副作用として JavaScript を活用する高度な編集系サードパーティ製プラグインとは相性が悪いかもしれません。  
+ただし、JavaScript を活用する高度な編集系サードパーティ製プラグインとは相性が悪いかもしれません。  
 PukiWiki をほぼ素のままで運用し、手軽にスパム対策したいかた向けです。
 
 禁止語句によるスパム判定機能もあります。  
@@ -27,12 +26,12 @@ reCAPTCHA を使わず、禁止語句判定のみ用いることも可能です�
 以下の手順に沿って PukiWiki に導入してください。
 
 1. [GitHubページ](https://github.com/ikamonster/pukiwiki-recaptcha3) からダウンロードした recaptcha3.inc.php を PukiWiki の plugin ディレクトリに配置する。
-2. Google reCAPTCHA サイトでウィキのドメインを「reCAPTCHA v3」タイプで登録し、取得したサイトキー・シークレットキーを本プラグイン内の定数 PLUGIN_RECAPTCHA3_SITE_KEY, PLUGIN_RECAPTCHA3_SECRET_KEY に設定する。
-3. スキンファイルのほぼ末尾、</body> 閉じタグの直前に次のコードを挿入する。  
+2. Google reCAPTCHA サイトで対象PukiWikiサイトのドメインを「**reCAPTCHA v3**」タイプで登録し、取得したサイトキーとシークレットキーとを本プラグイン内の定数 PLUGIN_RECAPTCHA3_SITE_KEY, PLUGIN_RECAPTCHA3_SECRET_KEY にそれぞれ設定する。
+3. PukiWikiスキンファイルのほぼ末尾、\</body> タグの直前に次のコードを挿入する。  
 ```PHP
 <?php if (exist_plugin_convert('recaptcha3')) echo do_plugin_convert('recaptcha3'); // reCAPTCHA v3 plugin ?>
 ```
-4. ライブラリファイル lib/plugin.php の「function do_plugin_action($name)」関数内、「```$retvar = call_user_func('plugin_' . $name . '_action');```」行の直前に次のコードを挿入する。  
+4. PukiWikiライブラリファイル lib/plugin.php の「function do_plugin_action($name)」関数内、「```$retvar = call_user_func('plugin_' . $name . '_action');```」行の直前に次のコードを挿入する。  
 ```PHP
 if (exist_plugin_action('recaptcha3') && ($__v = call_user_func_array('plugin_recaptcha3_action', array($name))['body'])) die_message($__v); // reCAPTCHA v3 plugin
 ```
@@ -53,7 +52,7 @@ if (exist_plugin_action('recaptcha3') && ($__v = call_user_func_array('plugin_re
 |PLUGIN_RECAPTCHA3_HIDE_BADGE|0 or 1|1|reCAPTCHAバッジを非表示にし、代替文言を出力する。Googleの規約によりバッジか文言どちらかの表示が必須|
 |PLUGIN_RECAPTCHA3_API_TIMEOUT|任意の数値|0|reCAPTCHA APIタイムアウト時間（秒）。0なら無指定|
 |PLUGIN_RECAPTCHA3_CENSORSHIP|文字列||投稿禁止語句を表す正規表現|
-|PLUGIN_RECAPTCHA3_CHECK_REFERER|0 or 1|0|1ならリファラーを参照し自サイト以外からの要求を拒否。信頼性が低いため非推奨、応急処置に用いる|
+|PLUGIN_RECAPTCHA3_CHECK_REFERER|0 or 1|0|1ならリファラーを参照し自サイト以外からの要求を拒否。信頼性が低いため非推奨|
 |PLUGIN_RECAPTCHA3_ERR_STATUS|HTTPステータスコード|403|拒否時に返すHTTPステータスコード|
 |PLUGIN_RECAPTCHA3_DISABLED|0 or 1|0|1なら本プラグインを無効化（メンテナンス用）|
 
