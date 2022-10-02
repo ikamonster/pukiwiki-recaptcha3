@@ -1,7 +1,7 @@
 <?php
 /**
 PukiWiki - Yet another WikiWikiWeb clone.
-recaptcha3.inc.php, v1.1.1 2020 M.Taniguchi
+recaptcha3.inc.php, v1.1.2 2020 M.Taniguchi
 License: GPL v3 or (at your option) any later version
 
 Google reCAPTCHA v3 によるスパム対策プラグイン。
@@ -96,7 +96,7 @@ __PluginRecaptcha3__.prototype.loadLib = function() {
 	if (!this.libLoaded) {
 		this.libLoaded = true;
 		var scriptElement = document.createElement('script');
-		scriptElement.src = '${libUrl}';
+		scriptElement.src = '{$libUrl}';
 		scriptElement.setAttribute('defer', 'defer');
 		document.body.appendChild(scriptElement);
 	}
@@ -166,11 +166,11 @@ __PluginRecaptcha3__.prototype.submit = function(e) {
 			else nameEle.parentNode.removeChild(nameEle);
 		}
 
-		if (${enabled}) {
+		if ({$enabled}) {
 			// reCAPTCHAトークン取得
 			grecaptcha.ready(function() {
 				try {
-					grecaptcha.execute('${siteKey}').then(function(token) {
+					grecaptcha.execute('{$siteKey}').then(function(token) {
 						// 送信パラメーターにトークンを追加
 						var ele = form.querySelector('input[name="__plugin_recaptcha3__"]');
 						if (!ele) {
