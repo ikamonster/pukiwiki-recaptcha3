@@ -1,29 +1,29 @@
 <?php
 /**
 PukiWiki - Yet another WikiWikiWeb clone.
-recaptcha3.inc.php, v1.1.2 2020 M.Taniguchi
+recaptcha3.inc.php, v1.1.2 2020 M. Taniguchi
 License: GPL v3 or (at your option) any later version
 
 Google reCAPTCHA v3 によるスパム対策プラグイン。
 
 ページ編集・コメント投稿・ファイル添付など、PukiWiki標準の編集機能をスパムから守ります。
-reCAPTCHA v3 は不審な送信者を学習により自動判定する不可視の防壁です。煩わしい文字入力をユーザーに要求せず、ウィキの使用感に影響しません。
+reCAPTCHA v3 は不審な送信者を自動判定する不可視の防壁です。煩わしい入力を要求せず、ウィキの使用感に影響しません。
 
-追加ファイルはこのプラグインだけ。PukiWiki本体の変更も最小限にし、なるべく簡単に導入できるようにしています。
-が、そのための副作用として、JavaScriptを活用する高度な編集系サードパーティ製プラグインとは相性が悪いかもしれません。
+追加ファイルはこのプラグインのファイル１つだけ。PukiWiki本体の変更も最小限にし、なるべく簡単に導入できるようにしています。
+ただし、JavaScriptを活用する高度な編集系サードパーティ製プラグインとは相性が悪いかもしれません。
 PukiWikiをほぼ素のままで運用し、手軽にスパム対策したいかた向けです。
 
-バージョン1.1より、禁止語句によるスパム判定を追加しました。reCAPTCHAを使わず、禁止語句判定のみ用いることも可能です。
+禁止語句によるスパム判定機能もあります。reCAPTCHAを使わず、禁止語句判定のみ用いることも可能です。
 
 【導入手順】
 以下の手順に沿ってシステムに導入してください。
 
-1) Google reCAPTCHA サイトでウィキのドメインを「reCAPTCHA v3」タイプで登録し、取得したサイトキー・シークレットキーをこのプラグインの定数 PLUGIN_RECAPTCHA3_SITE_KEY, PLUGIN_RECAPTCHA3_SECRET_KEY に設定する。
+1) Google reCAPTCHA サイトで対象PukiWikiサイトのドメインを「reCAPTCHA v3」タイプで登録し、取得したサイトキーとシークレットキーとをこのプラグインの定数 PLUGIN_RECAPTCHA3_SITE_KEY, PLUGIN_RECAPTCHA3_SECRET_KEY にそれぞれ設定する。
 
-2) ファイル skin/pukiwiki.skin.php のほぼ末尾、「</body>」（275行目あたり）の直前に次のコードを挿入する。
+2) PukiWikiスキンファイル（デフォルトは skin/pukiwiki.skin.php）のほぼ末尾、</body>タグの直前に次のコードを挿入する。
    <?php if (exist_plugin_convert('recaptcha3')) echo do_plugin_convert('recaptcha3'); // reCAPTCHA v3 plugin ?>
 
-3) ファイル lib/plugin.php の「function do_plugin_action($name)」関数内、「$retvar = call_user_func('plugin_' . $name . '_action');」の直前（92行目あたり）に次のコードを挿入する。
+3) PukiWikiライブラリファイル lib/plugin.php の「function do_plugin_action($name)」関数内、「$retvar = call_user_func('plugin_' . $name . '_action');」の直前に次のコードを挿入する。
    if (exist_plugin_action('recaptcha3') && ($__v = call_user_func_array('plugin_recaptcha3_action', array($name))['body'])) die_message($__v); // reCAPTCHA v3 plugin
 
 【ご注意】
@@ -31,20 +31,20 @@ PukiWikiをほぼ素のままで運用し、手軽にスパム対策したいか
 ・標準プラグイン以外の動作確認はしていません。サードパーティ製プラグインによっては機能が妨げられる場合があります。
 ・JavaScriptが有効でないと動作しません。
 ・サーバーからreCAPTCHA APIへのアクセスにcURLを使用します。
-・reCAPTCHA v3 について詳しくはGoogleのreCAPTCHAサイトをご覧ください。https://www.google.com/recaptcha/
+・reCAPTCHA v3 やその費用などについて詳しくはGoogleのreCAPTCHAサイトをご覧ください。https://www.google.com/recaptcha/
 */
 
 /////////////////////////////////////////////////
 // スパム対策プラグイン設定（recaptcha3.inc.php）
 if (!defined('PLUGIN_RECAPTCHA3_SITE_KEY'))        define('PLUGIN_RECAPTCHA3_SITE_KEY',       '');   // Google reCAPTCHA v3 サイトキー。空の場合、reCAPTCHA判定は実施されない
 if (!defined('PLUGIN_RECAPTCHA3_SECRET_KEY'))      define('PLUGIN_RECAPTCHA3_SECRET_KEY',     '');   // Google reCAPTCHA v3 シークレットキー。空の場合、reCAPTCHA判定は実施されない
-if (!defined('PLUGIN_RECAPTCHA3_SCORE_THRESHOLD')) define('PLUGIN_RECAPTCHA3_SCORE_THRESHOLD', 0.5); // スコア閾値（0.0～1.0）。reCAPTCHAによる判定スコアがこの値より低い送信者はスパマーとみなして要求を拒否する。なお、直接プラグインURLを叩く種類のロボットはスコアによらず必ず拒否される
+if (!defined('PLUGIN_RECAPTCHA3_SCORE_THRESHOLD')) define('PLUGIN_RECAPTCHA3_SCORE_THRESHOLD', 0.5); // スコア閾値（0.0～1.0）。reCAPTCHAによる判定スコアがこの値より低い送信者はスパマーとみなして要求を拒否する
 if (!defined('PLUGIN_RECAPTCHA3_HIDE_BADGE'))      define('PLUGIN_RECAPTCHA3_HIDE_BADGE',      1);   // reCAPTCHAバッジを非表示にし、代替文言を出力する。Googleの規約によりバッジか文言どちらかの表示が必須
-if (!defined('PLUGIN_RECAPTCHA3_API_TIMEOUT'))     define('PLUGIN_RECAPTCHA3_API_TIMEOUT',     0);   // reCAPTCHA APIタイムアウト時間（秒）。0なら無指定
+if (!defined('PLUGIN_RECAPTCHA3_API_TIMEOUT'))     define('PLUGIN_RECAPTCHA3_API_TIMEOUT',     0);   // reCAPTCHA APIタイムアウト時間（秒）。0ならPHP設定に準じる
 if (!defined('PLUGIN_RECAPTCHA3_CENSORSHIP'))      define('PLUGIN_RECAPTCHA3_CENSORSHIP',     '');   // 投稿禁止語句を表す正規表現（例：'/((https?|ftp)\:\/\/[\w!?\/\+\-_~=;\.,*&@#$%\(\)\'\[\]]+|宣伝文句)/ui'）
-if (!defined('PLUGIN_RECAPTCHA3_CHECK_REFERER'))   define('PLUGIN_RECAPTCHA3_CHECK_REFERER',   0);   // 1ならリファラーを参照し自サイト以外からの要求を拒否。リファラーは未送や偽装があり得るため頼るべきではないが、一時的な防御には使える局面があるかもしれない
+if (!defined('PLUGIN_RECAPTCHA3_CHECK_REFERER'))   define('PLUGIN_RECAPTCHA3_CHECK_REFERER',   0);   // 1ならリファラーを参照し自サイト以外からの要求を拒否。リファラーは未送や偽装があり得るため頼るべきではないが、防壁をわずかでも強化したい場合に用いる
 if (!defined('PLUGIN_RECAPTCHA3_ERR_STATUS'))      define('PLUGIN_RECAPTCHA3_ERR_STATUS',      403); // 拒否時に返すHTTPステータスコード
-if (!defined('PLUGIN_RECAPTCHA3_DISABLED'))        define('PLUGIN_RECAPTCHA3_DISABLED',        0);   // 1なら本プラグインを無効化
+if (!defined('PLUGIN_RECAPTCHA3_DISABLED'))        define('PLUGIN_RECAPTCHA3_DISABLED',        0);   // 1なら本プラグインを無効化。メンテナンス用
 
 
 // プラグイン出力
@@ -60,8 +60,7 @@ function plugin_recaptcha3_convert() {
 	$enabled = (PLUGIN_RECAPTCHA3_SITE_KEY && PLUGIN_RECAPTCHA3_SECRET_KEY);	// reCAPTCHA有効フラグ
 
 	// reCAPTCHAバッジ非表示なら代替文言設定
-	$protocol = 'https:';
-	$badge = (!PLUGIN_RECAPTCHA3_HIDE_BADGE || !$enabled)? '' : '<style>.grecaptcha-badge{visibility:hidden;max-height:0;max-width:0;margin:0;padding:0;border:none} #_p_recaptcha3_terms{font-size:7px}</style><div id="_p_recaptcha3_terms">This site is protected by reCAPTCHA and the Google <a href="' . $protocol . '//policies.google.com/privacy" rel="noopener nofollow external">Privacy Policy</a> and <a href="' . $protocol . '//policies.google.com/terms" rel="noopener nofollow external">Terms of Service</a> apply.</div>';
+	$badge = (!PLUGIN_RECAPTCHA3_HIDE_BADGE || !$enabled)? '' : '<style>.grecaptcha-badge{visibility:hidden;max-height:0;max-width:0;margin:0;padding:0;border:none} #_p_recaptcha3_terms{font-size:7px}</style><div id="_p_recaptcha3_terms">This site is protected by <a href="https://www.google.com/recaptcha/" rel="noopener nofollow external">reCAPTCHA</a> and the Google <a href="https://policies.google.com/privacy" rel="noopener nofollow external">Privacy Policy</a> and <a href="https://policies.google.com/terms" rel="noopener nofollow external">Terms of Service</a> apply.</div>';
 
 	// JavaScript
 	$siteKey = PLUGIN_RECAPTCHA3_SITE_KEY;
@@ -253,7 +252,7 @@ function plugin_recaptcha3_action() {
 
 					// reCAPTCHA API呼び出し
 					if ($enabled) {
-						$ch = curl_init('https:'.'//www.google.com/recaptcha/api/siteverify');
+						$ch = curl_init('https://www.google.com/recaptcha/api/siteverify');
 						curl_setopt($ch, CURLOPT_POST, true);
 						curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(array('secret' => PLUGIN_RECAPTCHA3_SECRET_KEY, 'response' => $vars['__plugin_recaptcha3__'])));
 						curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
