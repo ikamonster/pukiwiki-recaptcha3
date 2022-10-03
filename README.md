@@ -27,7 +27,7 @@ reCAPTCHA を使わず、禁止語句判定のみ用いることも可能です�
 
 1. [GitHubページ](https://github.com/ikamonster/pukiwiki-recaptcha3) からダウンロードした recaptcha3.inc.php を PukiWiki の plugin ディレクトリに配置する。
 2. Google reCAPTCHA サイトで対象PukiWikiサイトのドメインを「**reCAPTCHA v3**」タイプで登録し、取得したサイトキーとシークレットキーとを本プラグイン内の定数 PLUGIN_RECAPTCHA3_SITE_KEY, PLUGIN_RECAPTCHA3_SECRET_KEY にそれぞれ設定する。
-3. PukiWikiスキンファイルのほぼ末尾、\</body> タグの直前に次のコードを挿入する。  
+3. PukiWikiスキンファイル（デフォルトは skin/pukiwiki.skin.php）のほぼ末尾、\</body> タグの直前に次のコードを挿入する。  
 ```PHP
 <?php if (exist_plugin_convert('recaptcha3')) echo do_plugin_convert('recaptcha3'); // reCAPTCHA v3 plugin ?>
 ```
