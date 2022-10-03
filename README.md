@@ -50,7 +50,7 @@ if (exist_plugin_action('recaptcha3') && ($__v = call_user_func_array('plugin_re
 |PLUGIN_RECAPTCHA3_SECRET_KEY|文字列||Google reCAPTCHA v3 シークレットキー。空の場合、reCAPTCHA判定は実施されない|
 |PLUGIN_RECAPTCHA3_SCORE_THRESHOLD|0.0～1.0|0.5|スコア閾値（0.0～1.0）。reCAPTCHAによる判定スコアがこの値より低い送信者は拒否される|
 |PLUGIN_RECAPTCHA3_HIDE_BADGE|0 or 1|1|reCAPTCHAバッジを非表示にし、代替文言を出力する（Googleの規約によりバッジか文言どちらかの表示が必須）|
-|PLUGIN_RECAPTCHA3_API_TIMEOUT|任意の数値|0|reCAPTCHA APIタイムアウト時間（秒）。0なら無指定|
+|PLUGIN_RECAPTCHA3_API_TIMEOUT|任意の数値|0|reCAPTCHA APIタイムアウト時間（秒）。0ならPHP設定に準じる|
 |PLUGIN_RECAPTCHA3_CENSORSHIP|文字列||投稿禁止語句を表す正規表現|
 |PLUGIN_RECAPTCHA3_CHECK_REFERER|0 or 1|0|1ならリファラーを参照し自サイト以外からの要求を拒否。信頼性が低いため非推奨だが、防壁をわずかでも強化したい場合に用いる|
 |PLUGIN_RECAPTCHA3_ERR_STATUS|HTTPステータスコード|403|拒否時に返すHTTPステータスコード|
