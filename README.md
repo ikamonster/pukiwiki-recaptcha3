@@ -107,3 +107,4 @@ if (exist_plugin_action('recaptcha3') && ($__v = call_user_func_array('plugin_re
 * JavaScriptが有効でないと動作しません。
 * サーバーから reCAPTCHA API へのアクセスに cURL を使用します。
 * 閲覧専用（PKWK_READONLY が 1）のウィキにおいては本プラグインは何もしません。
+* reCATCHA はサードパーティー・クッキーを生成します。サイトのプライバシーポリシーや法令等に応じて適切に運用してください。
