@@ -1,7 +1,7 @@
 <?php
 /**
 PukiWiki - Yet another WikiWikiWeb clone.
-recaptcha3.inc.php, v1.1.2 2020 M. Taniguchi
+recaptcha3.inc.php, v1.1.3 2020 M. Taniguchi
 License: GPL v3 or (at your option) any later version
 
 Google reCAPTCHA v3 によるスパム対策プラグイン。
@@ -70,19 +70,19 @@ function plugin_recaptcha3_convert() {
 <script>
 'use strict';
 
-window.addEventListener('DOMContentLoaded', function(){
+window.addEventListener('DOMContentLoaded', () => {
 	new __PluginRecaptcha3__();
 });
 
-var	__PluginRecaptcha3__ = function() {
+const __PluginRecaptcha3__ = function() {
 	const	self = this;
 	this.timer = null;
 	this.libLoaded = false;
 
-	// 設定
+	/* 設定 */
 	this.update();
 
-	// DOMを監視し、もしページ内容が動的に変更されたら再設定する（モダンブラウザーのみ対応）
+	/* DOMを監視し、もしページ内容が動的に変更されたら再設定する（モダンブラウザーのみ対応） */
 	const observer = new MutationObserver(function(mutations){ mutations.forEach(function(mutation){ if (mutation.type == 'childList') self.update(); }); });
 	if (observer) {
 		const target = document.getElementsByTagName('body')[0];
@@ -90,7 +90,7 @@ var	__PluginRecaptcha3__ = function() {
 	}
 };
 
-// reCAPTCHAライブラリーロード
+/* reCAPTCHAライブラリーロード */
 __PluginRecaptcha3__.prototype.loadLib = function() {
 	if (!this.libLoaded) {
 		this.libLoaded = true;
@@ -101,53 +101,53 @@ __PluginRecaptcha3__.prototype.loadLib = function() {
 	}
 };
 
-// 設定
+/* 設定 */
 __PluginRecaptcha3__.prototype.setup = function() {
 	const	self = this;
 
-	// 全form要素を走査
+	/* 全form要素を走査 */
 	var	elements = document.getElementsByTagName('form');
 	for (var i = elements.length - 1; i >= 0; --i) {
 		var	form = elements[i];
 
-		// form内全submitボタンを走査しクリックイベントを設定
+		/* form内全submitボタンを走査しクリックイベントを設定 */
 		var eles = form.querySelectorAll('input[type="submit"]');
 		if (eles.length > 0) {
 			for (var j = eles.length - 1; j >= 0; --j) eles[j].addEventListener('click', self.submit, false);
 
-			// こちらのタイミングで送信するため、既定の送信イベントを止めておく
+			/* こちらのタイミングで送信するため、既定の送信イベントを止めておく */
 			form.addEventListener('submit', self.stopSubmit, false);
 
-			// reCAPTCHAライブラリーロード
+			/* reCAPTCHAライブラリーロード */
 			self.loadLib();
 		}
 	}
 };
 
-// 再設定
+/* 再設定 */
 __PluginRecaptcha3__.prototype.update = function() {
 	const	self = this;
 	if (this.timer) clearTimeout(this.timer);
 	this.timer = setTimeout(function() { self.setup(); self.timer = null; }, 50);
 };
 
-// 送信防止
+/* 送信防止 */
 __PluginRecaptcha3__.prototype.stopSubmit = function(e) {
 	e.preventDefault();
 	e.stopPropagation();
 	return false;
 };
 
-// クリック時送信処理
+/* クリック時送信処理 */
 __PluginRecaptcha3__.prototype.submit = function(e) {
 	var	form;
 	if (this.closest) {
 		form = this.closest('form');
 	} else {
-		for (form = this.parentNode; form; form = form.parentNode) if (form.nodeName.toLowerCase() == 'form') break;	// 旧ブラウザー対策
+		for (form = this.parentNode; form; form = form.parentNode) if (form.nodeName.toLowerCase() == 'form') break;	/* 旧ブラウザー対策 */
 	}
 
-	// クリックされたsubmitボタンのname,value属性をhiddenにコピー（submitボタンが複数ある場合への対処）
+	/* クリックされたsubmitボタンのname,value属性をhiddenにコピー（submitボタンが複数ある場合への対処） */
 	if (form)  {
 		var nameEle = form.querySelector('.__plugin_recaptcha3_submit__');
 		var	name = this.getAttribute('name');
@@ -166,24 +166,24 @@ __PluginRecaptcha3__.prototype.submit = function(e) {
 		}
 
 		if ({$enabled}) {
-			// reCAPTCHAトークン取得
+			/* reCAPTCHAトークン取得 */
 			grecaptcha.ready(function() {
 				try {
 					grecaptcha.execute('{$siteKey}').then(function(token) {
-						// 送信パラメーターにトークンを追加
+						/* 送信パラメーターにトークンを追加 */
 						var ele = form.querySelector('input[name="__plugin_recaptcha3__"]');
 						if (!ele) {
 							form.insertAdjacentHTML('beforeend', '<input type="hidden" name="__plugin_recaptcha3__" value="' + token + '"/>');
 						} else {
 							ele.setAttribute('value', token);
 						}
-						// フォーム送信
+						/* フォーム送信 */
 						form.submit();
 					});
 				} catch(e) {}
 			});
 		} else {
-			// reCAPTCHA無効なら即フォーム送信
+			/* reCAPTCHA無効なら即フォーム送信 */
 			form.submit();
 		}
 	}
@@ -192,7 +192,11 @@ __PluginRecaptcha3__.prototype.submit = function(e) {
 </script>
 EOT;
 
-	return $badge . $js;
+	$body = $badge . $js;
+
+	$body = preg_replace("/((\s|\n){1,})/i", ' ', $body);	// 連続空白を単一空白に（※「//」コメント非対応）
+
+	return $body;
 }
 
 
